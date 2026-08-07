@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ImagePlus, Download, Trash2, Settings } from "lucide-react";
 import UploadZone from "./UploadZone";
 import FramePreview from "./FramePreview";
@@ -32,19 +32,31 @@ const ScreenshotFramer = ({
   // Update selectedFrame when frames are loaded
   useEffect(() => {
     if (frames.length > 0 && !selectedFrame) {
+      // Try to load last used device from localStorage
+      const lastDeviceId = localStorage.getItem('lastDeviceId');
+      if (lastDeviceId) {
+        const lastFrame = frames.find(f => f.id === lastDeviceId);
+        if (lastFrame) {
+          setSelectedFrame(lastFrame);
+          return;
+        }
+      }
       setSelectedFrame(frames[0]);
     }
   }, [frames, selectedFrame]);
+
+  // Save selected frame to localStorage whenever it changes
+  useEffect(() => {
+    if (selectedFrame) {
+      localStorage.setItem('lastDeviceId', selectedFrame.id);
+    }
+  }, [selectedFrame]);
 
   const findFrameByScreenshotSize = (
     frames: DeviceFrame[],
     width: number,
     height: number
   ): DeviceFrame | undefined => {
-    const allSizes = frames.map((f) => ({
-      w: f.coordinates.screenshotWidth,
-      h: f.coordinates.screenshotHeight,
-    }));
     const found = frames.find((frame: DeviceFrame) => {
       const fw = frame.coordinates.screenshotWidth;
       const fh = frame.coordinates.screenshotHeight;
