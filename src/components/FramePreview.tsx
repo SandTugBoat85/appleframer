@@ -5,9 +5,10 @@ import { DeviceFrame, getFramePath } from '../hooks/useFrames';
 interface FramePreviewProps {
   image: File;
   frame: DeviceFrame;
+  downloadFilename?: string;
 }
 
-const FramePreview = ({ image, frame }: FramePreviewProps) => {
+const FramePreview = ({ image, frame, downloadFilename }: FramePreviewProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRenderSeqRef = useRef<number>(0);
   const [imageUrl, setImageUrl] = useState<string>('');
@@ -228,7 +229,7 @@ const FramePreview = ({ image, frame }: FramePreviewProps) => {
 
     // Download the rendered image
     const link = document.createElement('a');
-    link.download = `framed-${image.name.replace(/\.[^/.]+$/, '')}.png`;
+    link.download = downloadFilename || `framed-${image.name.replace(/\.[^/.]+$/, '')}.png`;
     link.href = tempCanvas.toDataURL('image/png');
     document.body.appendChild(link);
     link.click();
